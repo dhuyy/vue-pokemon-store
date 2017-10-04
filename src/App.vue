@@ -1,19 +1,31 @@
 <template>
   <div id="app">
-    <div class="header">
-        <h1>Vue.js Pokémon Store</h1>
-    </div>
-    <div class="main">
-        <div class="products">
-            <p>Pokémons go here.</p>
+    <header>
+      <h1>{{ title }}</h1>
+    </header>
+    <section class="main">
+      <div class="products">
+        <div class="product" v-for="item in items">
+          <h4 class="product-title">{{ item.title }}</h4>
+          <button @click="addItem(item)" class="add-to-cart">Add to Cart</button>
         </div>
-        <div class="cart">
-            <h2>Shopping Cart</h2>
-            <div>
-                No items in the cart.
-            </div>
+      </div>
+      <div class="cart">
+        <h2>Shopping Cart</h2>
+        <ul>
+          <li class="cart-item" v-for="item in cart">
+            <div class="item-title">{{ item.title }}</div>
+            <span class="item-qty">{{ item.quantity }} x $ {{ item.price }}</span>
+          </li>
+        </ul>
+        <div v-if="cart.length">
+          <div>Total: $ {{ total | toFixed }}</div>
         </div>
-    </div>
+        <div v-else class="empty-cart">
+          <div>No items in the cart.</div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -22,7 +34,45 @@ export default {
   name: 'app',
   data () {
     return {
+      title: 'Vue.js Pokémon Store',
+      total: 0,
+      items: [
+        {
+          id: 1,
+          title: 'Item 1',
+          price: 9.99,
+          quantity: 1
+        },
+        {
+          id: 2,
+          title: 'Item 2',
+          price: 9.99,
+          quantity: 1
+        },
+        {
+          id: 3,
+          title: 'Item 3',
+          price: 9.99,
+          quantity: 1
+        }
+      ],
+      cart: []
+    }
+  },
 
+  methods: {
+    addItem(item) {
+      this.total += item.price;
+
+      const existingItem = this.cart.filter(element => element.id == item.id )
+
+      existingItem.length > 0 ? item.quantity++ : this.cart.push(item)
+    }
+  },
+
+  filters: {
+    toFixed(value) {
+      return value.toFixed(2)
     }
   }
 }
@@ -85,7 +135,7 @@ body {
   flex-direction: column;
 }
 
-.header {
+header {
   flex: 0;
   padding: 1rem 0;
 }
