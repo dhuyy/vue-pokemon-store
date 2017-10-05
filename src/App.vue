@@ -1,13 +1,17 @@
 <template>
   <div id="app">
     <header>
-      <h1>{{ title }}</h1>
+      <h1>Vue.js Pokémon Store</h1>
+      <form class="searchbar"@submit.prevent="onSubmitSearch">
+        <input v-model="searchTerm" type="text" placeholder="Type here...">
+        <input type="submit" value="Search" class="btn">
+      </form>
     </header>
     <section class="main">
       <div class="products">
         <div class="product" v-for="item in items">
           <h4 class="product-title">{{ item.title }}</h4>
-          <button @click="addItem(item)" class="add-to-cart">Add to Cart</button>
+          <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
         </div>
       </div>
       <div class="cart">
@@ -32,12 +36,14 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'app',
   data () {
     return {
-      title: 'Vue.js Pokémon Store',
       total: 0,
+      searchTerm: '',
       items: [
         {
           id: 1,
@@ -81,15 +87,17 @@ export default {
     dec(item) {
       if ((item.quantity - 1) == 0) {
         this.cart.forEach((element, i) => {
-          if (element.id == item.id) {
-            this.cart.splice(i, 1)
-          }
+          if (element.id == item.id) this.cart.splice(i, 1)
         })
       } else {
         item.quantity--
       }
-      
+
       this.total -= item.price
+    },
+
+    onSubmitSearch() {
+
     }
   },
 
