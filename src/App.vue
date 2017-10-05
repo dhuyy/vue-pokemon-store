@@ -79,10 +79,17 @@ export default {
     },
 
     dec(item) {
-      if (item.quantity > 1) {
+      if ((item.quantity - 1) == 0) {
+        this.cart.forEach((element, i) => {
+          if (element.id == item.id) {
+            this.cart.splice(i, 1)
+          }
+        })
+      } else {
         item.quantity--
-        this.total -= item.price
       }
+      
+      this.total -= item.price
     }
   },
 
