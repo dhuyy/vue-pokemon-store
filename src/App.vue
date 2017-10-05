@@ -16,6 +16,8 @@
           <li class="cart-item" v-for="item in cart">
             <div class="item-title">{{ item.title }}</div>
             <span class="item-qty">{{ item.quantity }} x {{ item.price | currency }}</span>
+            <button class="btn" @click="inc(item)">+</button>
+            <button class="btn" @click="dec(item)">-</button>
           </li>
         </ul>
         <div v-if="cart.length">
@@ -67,6 +69,20 @@ export default {
       const existingItem = this.cart.filter(element => element.id == item.id )
 
       existingItem.length > 0 ? item.quantity++ : this.cart.push(item)
+    },
+
+    inc(item) {
+      if (item.quantity >= 0) {
+        item.quantity++
+        this.total += item.price
+      }
+    },
+
+    dec(item) {
+      if (item.quantity > 1) {
+        item.quantity--
+        this.total -= item.price
+      }
     }
   },
 
