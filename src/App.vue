@@ -9,9 +9,19 @@
     </header>
     <section class="main">
       <div class="products">
+        <div class="search-results">
+          Found {{ items.length }} results.
+        </div>
         <div class="product" v-for="item in items">
-          <h4 class="product-title">{{ item.title }}</h4>
-          <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
+          <div>
+            <div class="product-image">
+              <img src="" alt="">
+            </div>            
+          </div>
+          <div>
+            <h4 class="product-title">{{ item.title }}</h4>
+            <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
+          </div>
         </div>
       </div>
       <div class="cart">
@@ -44,28 +54,24 @@ export default {
     return {
       total: 0,
       searchTerm: '',
-      items: [
-        {
-          id: 1,
-          title: 'Item 1',
-          price: 9.99,
-          quantity: 1
-        },
-        {
-          id: 2,
-          title: 'Item 2',
-          price: 9.99,
-          quantity: 1
-        },
-        {
-          id: 3,
-          title: 'Item 3',
-          price: 9.99,
-          quantity: 1
-        }
-      ],
+      items: [],
       cart: []
     }
+  },
+
+  created() {
+    axios.get('https://pokeapi.co/api/v2/generation/1')
+      .then(response => {
+        this.items = response.data.pokemon_species.map(element => {
+          return {
+            id: 1,
+            title: element.name,
+            price: 9.99,
+            quantity: 1
+          }
+        })
+      })
+    ;
   },
 
   methods: {
