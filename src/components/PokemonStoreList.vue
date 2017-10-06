@@ -1,6 +1,9 @@
 <template>
   <div class="products">
-    <div class="search-results" v-show="showFoundLabel">
+    <div v-if="showLoading">
+      Loading...
+    </div>
+    <div v-else class="search-results">
       Found {{ items.length }} pokémons.
     </div>
     <div class="product" v-for="item in items">
@@ -25,7 +28,7 @@ export default {
   data() {
     return {
       items: [],
-      showFoundLabel: false,
+      showLoading: true
     }
   },
 
@@ -33,7 +36,10 @@ export default {
     this.getAllPokemons();
 
     Event.listen('onSearch', term => {
-      this.getPokemon(term)
+      this.items = []
+      this.showLoading = true
+
+      term.trim() == '' ? this.getAllPokemons() : this.getPokemon(term);
     })
   },
 
@@ -54,9 +60,8 @@ export default {
         }`
       })
       .then(response => {
-        if (!this.showFoundLabel) this.showFoundLabel = true;
-
         this.items = response.data.data.pokemons.map(element => {
+
           return {
             id: element.id,
             name: element.name,
@@ -65,16 +70,13 @@ export default {
             quantity: 1
           }
         })
+
+        this.showLoading = false
       })
     },
 
     
     getPokemon(term) {
-      if (term.trim() == '') {
-        this.getAllPokemons();
-        return;
-      }
-
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
           pokemon(name: "${term}") {
@@ -95,6 +97,8 @@ export default {
           image: pokemon.image,
           quantity: 1
         }]
+
+        this.showLoading = false
       })
     }
   },
