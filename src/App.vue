@@ -15,11 +15,11 @@
         <div class="product" v-for="item in items">
           <div>
             <div class="product-image">
-              <img src="" alt="">
+              <img :src="item.image" alt="">
             </div>            
           </div>
           <div>
-            <h4 class="product-title">{{ item.title }}</h4>
+            <h4 class="product-title">{{ item.name }}</h4>
             <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
           </div>
         </div>
@@ -28,7 +28,7 @@
         <h2>Shopping Cart</h2>
         <ul>
           <li class="cart-item" v-for="item in cart">
-            <div class="item-title">{{ item.title }}</div>
+            <div class="item-title">{{ item.name }}</div>
             <span class="item-qty">{{ item.quantity }} x {{ item.price | currency }}</span>
             <button class="btn" @click="inc(item)">+</button>
             <button class="btn" @click="dec(item)">-</button>
@@ -52,6 +52,7 @@ export default {
   name: 'app',
   data () {
     return {
+      limit: 2,
       total: 0,
       searchTerm: '',
       items: [],
@@ -60,18 +61,27 @@ export default {
   },
 
   created() {
-    axios.get('https://pokeapi.co/api/v2/generation/1')
-      .then(response => {
-        this.items = response.data.pokemon_species.map(element => {
-          return {
-            id: 1,
-            title: element.name,
-            price: 9.99,
-            quantity: 1
-          }
-        })
+    axios.post('https://graphql-pokemon.now.sh', {
+      query: `{
+        pokemons (first:${this.limit}) {
+          id
+          name
+          maxCP
+          image
+        }
+      }`
+    })
+    .then(response => {
+      this.items = response.data.data.pokemons.map(element => {
+        return {
+          id: element.id,
+          name: element.name,
+          price: element.maxCP,
+          image: element.image,
+          quantity: 1
+        }
       })
-    ;
+    })
   },
 
   methods: {
@@ -109,7 +119,7 @@ export default {
 
   filters: {
     currency(value) {
-      return '$ '.concat(value.toFixed(2))
+      return '$ '.concat(value.toFixed(2) * .01)
     }
   }
 }
@@ -267,15 +277,16 @@ h1 {
 }
 
 .product-image {
-  max-height: 150px;
   width: 250px;
+  height: 150px;
   overflow: hidden;
   border: 1px solid #E9E9E9;
   border-radius: 2px;
 }
 
 .product-image > img {
-  width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
   display: block;
 }
 
