@@ -2,7 +2,7 @@
   <div id="app">
     <header>
       <h1>Vue.js Pokémon Store</h1>
-      <form class="searchbar"@submit.prevent="onSubmitSearch">
+      <form class="searchbar"@submit.prevent="getPokemon">
         <input v-model="searchTerm" type="text" placeholder="Type here...">
         <input type="submit" value="Search" class="btn">
       </form>
@@ -53,7 +53,7 @@ export default {
   name: 'app',
   data () {
     return {
-      limit: 151,
+      limit: 10,
       total: 0,
       searchTerm: '',
       foundVisibility: false,
@@ -63,29 +63,7 @@ export default {
   },
 
   created() {
-    axios.post('https://graphql-pokemon.now.sh', {
-      query: `{
-        pokemons(first: ${this.limit}) {
-          id
-          name
-          maxCP
-          image
-        }
-      }`
-    })
-    .then(response => {
-      !this.foundVisibility ? this.foundVisibility = true : null;
-
-      this.items = response.data.data.pokemons.map(element => {
-        return {
-          id: element.id,
-          name: element.name,
-          price: element.maxCP,
-          image: element.image,
-          quantity: 1
-        }
-      })
-    })
+    this.getAllPokemons()
   },
 
   methods: {
@@ -116,8 +94,59 @@ export default {
       this.total -= item.price
     },
 
-    onSubmitSearch() {
+    getAllPokemons() {
+      axios.post('https://graphql-pokemon.now.sh', {
+        query: `{
+          pokemons(first: ${this.limit}) {
+            id
+            name
+            maxCP
+            image
+          }
+        }`
+      })
+      .then(response => {
+        !this.foundVisibility ? this.foundVisibility = true : null;
 
+        this.items = response.data.data.pokemons.map(element => {
+          return {
+            id: element.id,
+            name: element.name,
+            price: element.maxCP,
+            image: element.image,
+            quantity: 1
+          }
+        })
+      })
+    },
+
+    getPokemon() {
+      if (this.searchTerm.trim() == '') {
+        this.getAllPokemons();
+        return;
+      }
+
+      axios.post('https://graphql-pokemon.now.sh', {
+        query: `{
+          pokemon(name: "${this.searchTerm}") {
+            id
+            name
+            maxCP
+            image
+          }
+        }`
+      })
+      .then(response => {
+        const pokemon = response.data.data.pokemon;
+
+        this.items = [{
+          id: pokemon.id,
+          name: pokemon.name,
+          price: pokemon.maxCP,
+          image: pokemon.image,
+          quantity: 1
+        }]
+      })
     }
   },
 
