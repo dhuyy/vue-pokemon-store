@@ -9,23 +9,7 @@
     </header>
     <section class="main">
       <PokemonList></PokemonList>
-      <div class="cart">
-        <h2>Shopping Cart</h2>
-        <ul>
-          <li class="cart-item" v-for="item in cart">
-            <div class="item-title">{{ item.name }}</div>
-            <span class="item-qty">{{ item.quantity }} x {{ item.price | currency }}</span>
-            <button class="btn" @click="inc(item)">+</button>
-            <button class="btn" @click="dec(item)">-</button>
-          </li>
-        </ul>
-        <div v-if="cart.length">
-          <div>Total: {{ total | currency }}</div>
-        </div>
-        <div v-else class="empty-cart">
-          <div>No items in the cart.</div>
-        </div>
-      </div>
+      <PokemonCart></PokemonCart>
     </section>
   </div>
 </template>
@@ -33,81 +17,17 @@
 <script>
 import axios from 'axios'
 import PokemonList from './components/PokemonList.vue'
+import PokemonCart from './components/PokemonCart.vue'
 
 export default {
   name: 'app',
   components: {
-    PokemonList
+    PokemonList,
+    PokemonCart
   },
   data () {
     return {
-      total: 0,
-      searchTerm: '',
-      cart: []
-    }
-  },
-
-  methods: {
-    addItem(item) {
-      this.total += item.price;
-
-      const existingItem = this.cart.filter(element => element.id == item.id )
-
-      existingItem.length > 0 ? item.quantity++ : this.cart.push(item)
-    },
-
-    inc(item) {
-      if (item.quantity >= 0) {
-        item.quantity++
-        this.total += item.price
-      }
-    },
-
-    dec(item) {
-      if ((item.quantity - 1) == 0) {
-        this.cart.forEach((element, i) => {
-          if (element.id == item.id) this.cart.splice(i, 1)
-        })
-      } else {
-        item.quantity--
-      }
-
-      this.total -= item.price
-    },
-
-    getPokemon() {
-      if (this.searchTerm.trim() == '') {
-        this.getAllPokemons();
-        return;
-      }
-
-      axios.post('https://graphql-pokemon.now.sh', {
-        query: `{
-          pokemon(name: "${this.searchTerm}") {
-            id
-            name
-            maxCP
-            image
-          }
-        }`
-      })
-      .then(response => {
-        const pokemon = response.data.data.pokemon;
-
-        this.items = [{
-          id: pokemon.id,
-          name: pokemon.name,
-          price: pokemon.maxCP,
-          image: pokemon.image,
-          quantity: 1
-        }]
-      })
-    }
-  },
-
-  filters: {
-    currency(value) {
-      return '$ '.concat((value * .01).toFixed(2))
+      searchTerm: ''
     }
   }
 }
@@ -226,59 +146,5 @@ h1 {
   font-size: 0.8rem;
   color: white;
   user-select: none;
-}
-
-/* Cart */
-
-.cart {
-  margin-left: 1rem;
-  padding-left: 1rem;
-}
-
-.cart .empty-cart {
-  padding-top: 1rem;
-}
-
-.cart > h2 {
-  margin-top: 0;
-}
-
-.cart ul {
-  width: 100%;
-  font-size: 0.9rem;
-  border-top: 2px solid black;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.cart ul li {
-  vertical-align: top;
-  padding: 1rem 1rem 1rem 0;
-}
-
-.cart ul .cart-item {
-  border-bottom: 1px solid #E9E9E9;
-}
-
-.cart ul .cart-item .item-title {
-
-}
-
-.cart ul .cart-item .item-price {
-  font-weight: bold;
-  padding-top: 0.5rem;
-}
-
-.cart ul .cart-item .item-qty {
-  margin-right: 1rem;
-}
-
-.cart ul .cart-item:last-child {
-  border-bottom: none;
-}
-
-.cart ul .cart-item button {
-  margin-right: 3px;
 }
 </style>

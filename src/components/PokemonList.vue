@@ -60,6 +60,36 @@ export default {
           }
         })
       })
+    },
+
+    
+    getPokemon() {
+      if (this.searchTerm.trim() == '') {
+        this.getAllPokemons();
+        return;
+      }
+
+      axios.post('https://graphql-pokemon.now.sh', {
+        query: `{
+          pokemon(name: "${this.searchTerm}") {
+            id
+            name
+            maxCP
+            image
+          }
+        }`
+      })
+      .then(response => {
+        const pokemon = response.data.data.pokemon;
+
+        this.items = [{
+          id: pokemon.id,
+          name: pokemon.name,
+          price: pokemon.maxCP,
+          image: pokemon.image,
+          quantity: 1
+        }]
+      })
     }
   },
 
