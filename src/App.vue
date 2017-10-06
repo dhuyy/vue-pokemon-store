@@ -9,8 +9,8 @@
     </header>
     <section class="main">
       <div class="products">
-        <div class="search-results">
-          Found {{ items.length }} results.
+        <div class="search-results" v-show="foundVisibility">
+          Found {{ items.length }} pokémons.
         </div>
         <div class="product" v-for="item in items">
           <div>
@@ -20,6 +20,7 @@
           </div>
           <div>
             <h4 class="product-title">{{ item.name }}</h4>
+            <h5 class="product-price">{{ item.price | currency }}</h5>
             <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
           </div>
         </div>
@@ -52,9 +53,10 @@ export default {
   name: 'app',
   data () {
     return {
-      limit: 2,
+      limit: 151,
       total: 0,
       searchTerm: '',
+      foundVisibility: false,
       items: [],
       cart: []
     }
@@ -63,7 +65,7 @@ export default {
   created() {
     axios.post('https://graphql-pokemon.now.sh', {
       query: `{
-        pokemons (first:${this.limit}) {
+        pokemons(first: ${this.limit}) {
           id
           name
           maxCP
@@ -72,6 +74,8 @@ export default {
       }`
     })
     .then(response => {
+      !this.foundVisibility ? this.foundVisibility = true : null;
+
       this.items = response.data.data.pokemons.map(element => {
         return {
           id: element.id,
@@ -119,7 +123,7 @@ export default {
 
   filters: {
     currency(value) {
-      return '$ '.concat(value.toFixed(2) * .01)
+      return '$ '.concat((value * .01).toFixed(2))
     }
   }
 }
@@ -291,6 +295,11 @@ h1 {
 }
 
 .product-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.product-price {
   margin-top: 0;
 }
 
