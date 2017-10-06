@@ -1,6 +1,6 @@
 <template>
   <div class="products">
-    <div class="search-results" v-show="foundVisibility">
+    <div class="search-results" v-show="showFoundLabel">
       Found {{ items.length }} pokémons.
     </div>
     <div class="product" v-for="item in items">
@@ -12,34 +12,40 @@
       <div>
         <h4 class="product-title">{{ item.name }}</h4>
         <h5 class="product-price">{{ item.price | currency }}</h5>
-        <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
+        <button @click="onClickAddToCart(item)" class="btn add-to-cart">Add to Cart</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
-  name: 'PokemonList',
+  name: 'PokemonStoreList',
+  props: ['numberOfPokemonsListed'],
   data() {
     return {
-      limit: 3,
       items: [],
-      foundVisibility: false,
+      showFoundLabel: false,
     }
   },
 
   created() {
-    this.getAllPokemons()
+    this.getAllPokemons();
+
+    Event.listen('onSearch', term => {
+      this.getPokemon(term)
+    })
   },
 
   methods: {
+    onClickAddToCart(item) {
+      Event.fire('onAddToCart', item);
+    },
+
     getAllPokemons() {
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
-          pokemons(first: ${this.limit}) {
+          pokemons(first: ${this.numberOfPokemonsListed}) {
             id
             name
             maxCP
@@ -48,7 +54,7 @@ export default {
         }`
       })
       .then(response => {
-        !this.foundVisibility ? this.foundVisibility = true : null;
+        if (!this.showFoundLabel) this.showFoundLabel = true;
 
         this.items = response.data.data.pokemons.map(element => {
           return {
@@ -63,15 +69,15 @@ export default {
     },
 
     
-    getPokemon() {
-      if (this.searchTerm.trim() == '') {
+    getPokemon(term) {
+      if (term.trim() == '') {
         this.getAllPokemons();
         return;
       }
 
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
-          pokemon(name: "${this.searchTerm}") {
+          pokemon(name: "${term}") {
             id
             name
             maxCP

@@ -1,6 +1,6 @@
 <template>
   <div class="cart">
-    <h2>Shopping Cart</h2>
+    <h2>Store Cart</h2>
     <ul>
       <li class="cart-item" v-for="item in cart">
         <div class="item-title">{{ item.name }}</div>
@@ -20,12 +20,18 @@
 
 <script>
 export default {
-  name: 'PokemonCart',
+  name: 'StoreCart',
   data() {
     return {
       total: 0,
       cart: []
     }
+  },
+
+  created() {
+    Event.listen('onAddToCart', item => {
+      this.addItem(item);
+    })
   },
 
   methods: {

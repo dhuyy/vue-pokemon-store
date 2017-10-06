@@ -1,36 +1,41 @@
 <template>
   <div id="app">
-    <Header></Header>
+    <StoreHeader title="Vue.js Pokémon Store"></StoreHeader>
     <section class="main">
-      <PokemonList></PokemonList>
-      <PokemonCart></PokemonCart>
+      <PokemonStoreList number-of-pokemons-listed="3"></PokemonStoreList>
+      <StoreCart></StoreCart>
     </section>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import Header from './components/Header.vue'
-import PokemonList from './components/PokemonList.vue'
-import PokemonCart from './components/PokemonCart.vue'
+import StoreHeader from './components/StoreHeader.vue';
+import PokemonStoreList from './components/PokemonStoreList.vue';
+import StoreCart from './components/StoreCart.vue';
 
 export default {
   name: 'app',
   components: {
-    Header,
-    PokemonList,
-    PokemonCart
-  },
-  data () {
-    return {
-
-    }
+    StoreHeader,
+    PokemonStoreList,
+    StoreCart
   }
 }
 </script>
 
 <style>
 /* Generic styling */
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  background-color: #F5F5F5;
+}
 
 h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif;
@@ -66,17 +71,6 @@ button:focus, input:focus {
 }
 
 /* Sections */
-
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  font-family: 'Lato', sans-serif;
-  background-color: #F5F5F5;
-}
 
 #app {
   margin: 0 2rem;
