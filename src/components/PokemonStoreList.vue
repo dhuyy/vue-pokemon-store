@@ -48,6 +48,16 @@ export default {
       Event.fire('onAddToCart', item);
     },
 
+    createPokemonObject(object) {
+      return {
+        id: object.id,
+        name: object.name,
+        price: object.maxCP,
+        image: object.image,
+        quantity: 1
+      }
+    },
+
     getAllPokemons() {
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
@@ -61,14 +71,7 @@ export default {
       })
       .then(response => {
         this.items = response.data.data.pokemons.map(element => {
-
-          return {
-            id: element.id,
-            name: element.name,
-            price: element.maxCP,
-            image: element.image,
-            quantity: 1
-          }
+          return this.createPokemonObject(element)
         })
 
         this.showLoading = false
@@ -88,15 +91,7 @@ export default {
         }`
       })
       .then(response => {
-        const pokemon = response.data.data.pokemon;
-
-        this.items = [{
-          id: pokemon.id,
-          name: pokemon.name,
-          price: pokemon.maxCP,
-          image: pokemon.image,
-          quantity: 1
-        }]
+        this.items = [this.createPokemonObject(response.data.data.pokemon)]
 
         this.showLoading = false
       })
