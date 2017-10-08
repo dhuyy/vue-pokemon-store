@@ -1,18 +1,20 @@
 <template>
   <div class="cart">
     <h2>Store Cart</h2>
-    <ul>
+    <transition-group name="fade" tag="ul">
       <li class="cart-item" v-for="item in cart" :key="item.id">
         <div class="item-title">{{ item.name }}</div>
         <span class="item-qty">{{ item.quantity }} x {{ item.price | currency }}</span>
         <button class="btn" @click="inc(item)">+</button>
         <button class="btn" @click="dec(item)">-</button>
       </li>
-    </ul>
-    <div v-if="cart.length">
-      <div>Total: {{ total | currency }}</div>
-    </div>
-    <div v-else class="empty-cart">
+    </transition-group>
+    <transition name="fade">
+      <div v-if="cart.length">
+        <div>Total: {{ total | currency }}</div>
+      </div>
+    </transition>
+    <div v-if="cart.length == 0" class="empty-cart">
       <div>No items in the cart.</div>
     </div>
   </div>
