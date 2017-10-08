@@ -2,7 +2,7 @@
   <div class="cart">
     <h2>Store Cart</h2>
     <ul>
-      <li class="cart-item" v-for="item in cart">
+      <li class="cart-item" v-for="item in cart" :key="item.id">
         <div class="item-title">{{ item.name }}</div>
         <span class="item-qty">{{ item.quantity }} x {{ item.price | currency }}</span>
         <button class="btn" @click="inc(item)">+</button>

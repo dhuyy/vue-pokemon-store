@@ -6,7 +6,7 @@
     <div v-else class="search-results">
       Found {{ items.length }} pokémons.
     </div>
-    <div class="product" v-for="item in items">
+    <div class="product" v-for="item in items" :key="item.id">
       <div>
         <div class="product-image">
           <img :src="item.image" :alt="item.name">
