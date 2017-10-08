@@ -1,6 +1,9 @@
 <template>
   <div class="products">
-    <div class="search-results" v-show="foundVisibility">
+    <div v-if="showLoading">
+      Loading...
+    </div>
+    <div v-else class="search-results">
       Found {{ items.length }} pokémons.
     </div>
     <div class="product" v-for="item in items">
@@ -12,34 +15,53 @@
       <div>
         <h4 class="product-title">{{ item.name }}</h4>
         <h5 class="product-price">{{ item.price | currency }}</h5>
-        <button @click="addItem(item)" class="btn add-to-cart">Add to Cart</button>
+        <button @click="onClickAddToCart(item)" class="btn add-to-cart">Add to Cart</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
-  name: 'PokemonList',
+  name: 'PokemonStoreList',
+  props: ['numberOfPokemonsListed'],
   data() {
     return {
-      limit: 3,
       items: [],
-      foundVisibility: false,
+      showLoading: true
     }
   },
 
   created() {
-    this.getAllPokemons()
+    this.getAllPokemons();
+
+    Event.listen('onSearch', term => {
+      this.items = []
+      this.showLoading = true
+
+      term.trim() == '' ? this.getAllPokemons() : this.getPokemon(term);
+    })
   },
 
   methods: {
+    onClickAddToCart(item) {
+      Event.fire('onAddToCart', item);
+    },
+
+    createPokemonObject(object) {
+      return {
+        id: object.id,
+        name: object.name,
+        price: object.maxCP,
+        image: object.image,
+        quantity: 1
+      }
+    },
+
     getAllPokemons() {
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
-          pokemons(first: ${this.limit}) {
+          pokemons(first: ${this.numberOfPokemonsListed}) {
             id
             name
             maxCP
@@ -48,30 +70,19 @@ export default {
         }`
       })
       .then(response => {
-        !this.foundVisibility ? this.foundVisibility = true : null;
-
         this.items = response.data.data.pokemons.map(element => {
-          return {
-            id: element.id,
-            name: element.name,
-            price: element.maxCP,
-            image: element.image,
-            quantity: 1
-          }
+          return this.createPokemonObject(element)
         })
+
+        this.showLoading = false
       })
     },
 
     
-    getPokemon() {
-      if (this.searchTerm.trim() == '') {
-        this.getAllPokemons();
-        return;
-      }
-
+    getPokemon(term) {
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
-          pokemon(name: "${this.searchTerm}") {
+          pokemon(name: "${term}") {
             id
             name
             maxCP
@@ -80,15 +91,9 @@ export default {
         }`
       })
       .then(response => {
-        const pokemon = response.data.data.pokemon;
+        this.items = [this.createPokemonObject(response.data.data.pokemon)]
 
-        this.items = [{
-          id: pokemon.id,
-          name: pokemon.name,
-          price: pokemon.maxCP,
-          image: pokemon.image,
-          quantity: 1
-        }]
+        this.showLoading = false
       })
     }
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="header">
-    <h1>Vue.js Pokémon Store</h1>
-    <form class="searchbar"@submit.prevent="getPokemon">
+    <h1>{{ title }}</h1>
+    <form class="searchbar" @submit.prevent="onSubmitSearch">
       <input v-model="searchTerm" type="text" placeholder="Type here...">
       <input type="submit" value="Search" class="btn">
     </form>
@@ -10,16 +10,23 @@
 
 <script>
 export default {
-  name: 'Header',
+  name: 'StoreHeader',
+  props: ['title'],
   data () {
     return {
       searchTerm: ''
+    }
+  },
+
+  methods: {
+    onSubmitSearch() {
+      Event.fire('onSearch', this.searchTerm);
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 h1 {
   font-family: 'Luckiest Guy', cursive;
   font-size: 2.5rem;
