@@ -4,7 +4,7 @@
       Loading...
     </div>
     <div v-else class="search-results">
-      Found {{ items.length }} pokémons.
+      Found {{ results.length }} pokémons.
     </div>
     <div class="product" v-for="item in items" :key="item.id">
       <div>
@@ -18,15 +18,20 @@
         <button @click="onClickAddToCart(item)" class="btn add-to-cart">Add to Cart</button>
       </div>
     </div>
+    <div id="product-list-end"></div>
   </div>
 </template>
 
 <script>
+import scrollMonitor from 'scrollMonitor';
+
 export default {
   name: 'PokemonStoreList',
-  props: ['numberOfPokemonsListed'],
   data() {
     return {
+      numberOfFetchedPokemons: 151, // Total of Pokémons from the first generation
+      numberOfRenderedItems: 5,
+      results: [],
       items: [],
       showLoading: true
     }
@@ -43,7 +48,22 @@ export default {
     })
   },
 
+  mounted() {
+    this.setScrollMonitor();
+  },
+
   methods: {
+    renderChunkOfItems() {
+      const resultsLength = this.results.length;
+      const itemsRenderedLength = this.items.length;
+
+      if (itemsRenderedLength < resultsLength) {
+        const chunk = this.results.slice(itemsRenderedLength, itemsRenderedLength + this.numberOfRenderedItems);
+
+        this.items = this.items.concat(chunk);
+      }
+    },
+
     onClickAddToCart(item) {
       Event.fire('onAddToCart', item);
     },
@@ -61,7 +81,7 @@ export default {
     getAllPokemons() {
       axios.post('https://graphql-pokemon.now.sh', {
         query: `{
-          pokemons(first: ${this.numberOfPokemonsListed}) {
+          pokemons(first: ${this.numberOfFetchedPokemons}) {
             id
             name
             maxCP
@@ -70,14 +90,14 @@ export default {
         }`
       })
       .then(response => {
-        this.items = response.data.data.pokemons.map(element => {
+        this.results = response.data.data.pokemons.map(element => {
           return this.createPokemonObject(element)
-        })
+        });
 
-        this.showLoading = false
+        this.renderChunkOfItems();
+        this.showLoading = false;
       })
     },
-
     
     getPokemon(term) {
       axios.post('https://graphql-pokemon.now.sh', {
@@ -91,10 +111,19 @@ export default {
         }`
       })
       .then(response => {
-        this.items = [this.createPokemonObject(response.data.data.pokemon)]
+        this.results = [this.createPokemonObject(response.data.data.pokemon)];
 
-        this.showLoading = false
+        this.renderChunkOfItems();
+        this.showLoading = false;
       })
+    },
+
+    setScrollMonitor() {
+      scrollMonitor
+        .create(document.getElementById('product-list-end'))
+        .enterViewport(() => {
+          this.renderChunkOfItems();
+        })
     }
   },
 
@@ -169,7 +198,7 @@ export default {
   font-size: 0.8rem;
 }
 
-#product-list-bottom {
+#product-list-end {
   text-align: center;
   color: #AAAAAA;
   font-size: 0.85rem;

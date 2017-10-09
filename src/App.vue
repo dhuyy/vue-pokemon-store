@@ -2,7 +2,7 @@
   <div id="app">
     <StoreHeader title="Vue.js Pokémon Store"></StoreHeader>
     <section class="main">
-      <PokemonStoreList number-of-pokemons-listed="3"></PokemonStoreList>
+      <PokemonStoreList></PokemonStoreList>
       <StoreCart></StoreCart>
     </section>
   </div>
