@@ -3,7 +3,10 @@
     <div v-if="showLoading">
       Loading...
     </div>
-    <div v-else class="search-results">
+    <div v-if="showNoResults">
+      Sorry, no results were found.
+    </div>
+    <div v-if="!showLoading && !showNoResults" class="search-results">
       Found {{ results.length }} pokémons.
     </div>
     <div class="product" v-for="item in items" :key="item.id">
@@ -33,7 +36,8 @@ export default {
       numberOfRenderedItems: 5,
       results: [],
       items: [],
-      showLoading: true
+      showLoading: true,
+      showNoResults: false
     }
   },
 
@@ -42,6 +46,7 @@ export default {
 
     Event.listen('onSearch', term => {
       this.items = []
+      this.showNoResults = false
       this.showLoading = true
 
       term.trim() == '' ? this.getAllPokemons() : this.getPokemon(term);
@@ -116,14 +121,18 @@ export default {
         this.renderChunkOfItems();
         this.showLoading = false;
       })
+      .catch(error => {
+        this.showLoading = false;
+        this.showNoResults = true;
+      })
     },
 
     setScrollMonitor() {
       scrollMonitor
-        .create(document.getElementById('product-list-end'))
-        .enterViewport(() => {
-          this.renderChunkOfItems();
-        })
+      .create(document.getElementById('product-list-end'))
+      .enterViewport(() => {
+        this.renderChunkOfItems();
+      })
     }
   },
 
