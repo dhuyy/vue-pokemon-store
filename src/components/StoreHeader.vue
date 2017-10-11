@@ -32,7 +32,7 @@ h1 {
   font-size: 2.5rem;
   padding: 2rem 0 1rem;
   margin: 0;
-  color: #FFAFAF;
+  color: #7bc7a1;
   text-shadow: black 2px 1px 1px;
 }
 
