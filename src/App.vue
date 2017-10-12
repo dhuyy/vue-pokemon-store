@@ -24,7 +24,6 @@ export default {
 </script>
 
 <style>
-/* Generic styling */
 
 html, body {
   width: 100%;
@@ -59,18 +58,13 @@ button:focus, input:focus {
   opacity: 0.8;
 }
 
-[v-cloak] {
-  display: none !important;
-}
-
 .fade-enter-active {
   transition: opacity .5s
 }
+
 .fade-enter, .fade-leave-active {
   opacity: 0
 }
-
-/* Sections */
 
 #app {
   margin: 0 2rem;
@@ -99,4 +93,5 @@ button:focus, input:focus {
 .cart {
   flex: 2;
 }
+
 </style>
