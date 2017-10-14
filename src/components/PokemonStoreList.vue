@@ -1,11 +1,7 @@
 <template>
   <div class="products">
-    <div v-if="showLoading">
-      Loading...
-    </div>
-    <div v-if="showNoResults">
-      Sorry, no results were found.
-    </div>
+    <div v-if="showLoading">Loading...</div>
+    <div v-if="showNoResults">Sorry, no results were found.</div>
     <div v-if="!showLoading && !showNoResults" class="search-results">
       Found {{ results.length }} pokémons.
     </div>
