@@ -40,34 +40,34 @@ export default {
     addItem(item) {
       this.total += item.price;
 
-      const existingItem = this.cart.filter(element => element.id == item.id )
+      const existingItem = this.cart.filter(element => element.id == item.id);
 
       existingItem.length > 0 ? item.quantity++ : this.cart.push(item)
     },
 
     inc(item) {
       if (item.quantity >= 0) {
-        item.quantity++
-        this.total += item.price
+        item.quantity++;
+        this.total += item.price;
       }
     },
 
     dec(item) {
       if ((item.quantity - 1) == 0) {
         this.cart.forEach((element, i) => {
-          if (element.id == item.id) this.cart.splice(i, 1)
+          if (element.id == item.id) this.cart.splice(i, 1);
         })
       } else {
-        item.quantity--
+        item.quantity--;
       }
 
-      this.total -= item.price
+      this.total -= item.price;
     }
   },
 
   filters: {
     currency(value) {
-      return '$ '.concat((value * .01).toFixed(2))
+      return '$ '.concat((value * .01).toFixed(2));
     }
   }
 }
